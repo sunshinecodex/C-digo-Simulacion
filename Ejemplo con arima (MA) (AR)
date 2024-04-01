@@ -1,0 +1,23 @@
+# Supongamos que tenemos datos de ventas diarias de un producto
+ventas <- c(20, 25, 30, 35, 40, 45, 50, 55, 60, 65)
+
+# Ajustar un modelo AR(p)
+library(forecast)
+modelo_ar <- Arima(ventas, order = c(1, 0, 0))  # AR(1) con p=1, q=0
+
+# Mostrar el resumen del modelo AR(p)
+summary(modelo_ar)
+
+# Ajustar un modelo MA(q)
+modelo_ma <- Arima(ventas, order = c(0, 0, 1))  # MA(1) con p=0, q=1
+
+# Mostrar el resumen del modelo MA(q)
+summary(modelo_ma)
+
+# Hacer predicciones con el modelo AR(p)
+pred_ar <- forecast(modelo_ar, h = 3)  # Predicción para los próximos 3 días
+print(pred_ar)
+
+# Hacer predicciones con el modelo MA(q)
+pred_ma <- forecast(modelo_ma, h = 3)  # Predicción para los próximos 3 días
+print(pred_ma)
