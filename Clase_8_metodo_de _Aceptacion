@@ -1,0 +1,76 @@
+#Método de aceptación y rechazo
+#Generar números aleatorios de una distribución Beta(alpha=2, beta=4)
+#Supongamos que se tiene la distribución Beta f(x)~B(2,4) y es una distribucióno de tipo continua, y toca buscar una función
+#auxiliar para la función f(x).
+#f(x) es la función de interés, y se necesita una función g(x) que sea nuestra función auxiliar para generar números aleatorios
+#para la función f(x)
+#la condición es que f(x)%/%g(x) para todo x debe estar acotado el cociente por un M, es decir no toda función g(x) va a funcionar, siempre
+#se debe cumplir que f(x)/g(x)<=M. La función f(x)=1%/%(b-a) y g(x) es una función uniforme continua, es decir la distribución uni-
+#forme, es decir g(x)~miu(a,b), en la región R que se forma al acotar el dominio y el codominio se generan números aleatorios que
+#están por encima y por debajo de la función f(x), solo se toman los que están por debajo de f(x).
+#Para gráficar la curva usamos el comando curve(dbeta(x,2,4),lwd=2, from=-0.1,to=1.1)
+#M=optimize(f=dbeta(x,2,4),interval=c(0,1),maximum =T)$objective, el $objective
+
+fg=function(x){
+  dbeta(x,2,4)
+  }
+fg
+M=optimize(fg,interval=c(0,1),maximum=T)$objective
+M
+curve(dbeta(x,2,4),lwd=2,from=-0.1, to=1.1)
+abline(v=0,lty=3)
+abline(v=1, lty=3)
+abline(h=0,lty=3)
+segments(0,M,1,M,lty=2,lwd=2)#segmento que acota el codominio
+
+#el comando abline es para generar el rectangulo que acota la función en el codomino y dominio.
+#el segments genera un segmento que acota la función.
+#Algoritmo para generar números aleatorios en la región:
+#Paso 1:Generar números aleatorios U~u(0,1)
+#Paso 2:Generar un número de la función auxiliar T~g(x)
+#Paso 3: Si U que se genera en el paso 1 y se evalua f y g en x=T, entonces
+#cumple que U <= f(T)%/%M*g(T), de lo contrario, volver al paso 1, es decir se rechazó.
+#paso 1, paso 2 y paso 3 dentro de un for para generar muchas
+#y usar el if si genera números menores o iguales, de lo contrario volver al paso 1.
+#necesario usar un while para que rompa el cíclo.
+#El algoritmo sirve para cualquier función f y g que cumpla las condiciones previas
+#ALGORITMO EN R
+genbeta=function(alpha,beta){
+  while(TRUE){
+    U=runif(1,0,1)
+    P=runif(1,0,1)
+    if(U<=dbeta(P,alpha,beta)/2.1093*dunif(P))
+    {return(P)}
+  }
+}
+S=genbeta(2,4)
+S
+#U siempre es una uniforme
+#es la función g(x), no siempre es una uniforme, solo es para este caso
+
+#para generar muchos números aleatorios usamos el siguiente código
+
+genbetansim=function(nsim,alpha,beta){
+  X=numeric(nsim)
+  for(k in 1:nsim){
+    X[k]=genbeta(alpha,beta)}
+  return(X)
+  }
+X=genbetansim(1000,2,4)
+
+hist(X,breaks="FD",freq=F,col="red")
+curve(dbeta(x,2,4),add=T,lty=3,lwd=2,col="green")
+#X es un vector en el que se guarda la información
+#Para mirar independencia entre los datos miramos el siguiente comando
+ks.test(X,rbeta(1000,2,4))
+acf(X,main="Autocorrelación")
+pacf(X, main="Autocorrealación Parcial")
+PI=numeric(12)
+for(j in 1:12){
+  PI[j]=Box.test(X,lag=j,type="Ljung")$p.value
+}
+PI
+?rbeta
+?Box.test
+?ks.test
+#Se concluye que hay independencia en los datos desde el rezago 1 hasta el 12
