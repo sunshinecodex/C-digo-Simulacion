@@ -1,0 +1,22 @@
+#Clase 9
+
+# Cargar la biblioteca VGAM
+library(VGAM)
+
+# Generar una muestra de una distribución Laplace (doble exponencial)
+X <- rlaplace(1000, 0, 1)
+
+# Graficar un histograma de la muestra
+hist(X, breaks = "FD")
+
+curve(dnorm(x,0,1), col="red", from = -3, to=3, ylim= c(0,0.6))
+curve(dlaplace(x,0,1), add=T, lwd=3,col="green", from = -3, to=3)
+
+# Definir la función de razón de densidades
+fg <- function(x) {
+  return(dnorm(x, 0, 1) / dlaplace(x, 0, 1))
+}
+
+# Encontrar el máximo de la función
+M<- optimize(fg, interval = c(-3, 3), maximum = TRUE)
+M 
